@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The Office GIF Searcher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <link rel="shortcut icon" href="https://images-na.ssl-images-amazon.com/images/I/61-xqiGvsjL._SX425_.jpg">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+        crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Abril+Fatface|Kreon" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+
+        <header>The Office GIF Searcher</header>
+        <ul class="instruction">
+            <li>Click a button to display the GIFs.</li>
+            <li>Click a GIF to start/stop the GIF animation.</li>
+            <li>Add some more tags if you'd like!</li>
+        </ul>
+
+        <button id="clearBtn">Reset</button> 
+        <div id="buttonArea"></div>
+
+        <div class="row">
+
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="addInstruction"><i class="fas fa-plus-circle"></i>Add Another Search Tag: </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <p id="addInstruction1">e.g.: Angela Martin, Toby Flenderson, Erin Hannon, Ryan Howard, Darryl
+                            Philbin... </p>
+                        <input type="text" id="searchInput">
+                        <button id="addBtn">Add a GIF!</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="addInstruction"><i class="fas fa-coffee"></i>Learn More About "The Office": </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <span class="moreInfoStyle"><strong>IMDB Rating: </strong></span> <span id="imdbDisplay">???</span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <button id="imdbBtn">Reveal</button>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <span class="moreInfoStyle"><strong>4 Main Actors: </strong></span> <span id="actorDisplay">???</span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <button id="actorBtn">Reveal</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <span class="moreInfoStyle"><strong>Awards: </strong></span> <span id="awardsDisplay">???</span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <button id="awardsBtn">Reveal</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="addInstruction"><i class="fas fa-heart"></i>Favorites: </h3>
+                    </div>
+                    
+                    <div class="card-body">
+                        <p id="addInstruction1">Here are your favorite GIFs...</p>
+                        <div id="favGifDisplay"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-8">
+                <div id="gifDisplay"></div>
+            </div>
+
+            <div class="col-md-2">
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var topics = ["Michael Scott", "Jim Halpert", "Dwight Shrout", "Pam Beesly", "Kevin Malone", "Andy Bernard", "Kelly Kapoor", "Holly Flax", "Creed Bratton", "That's what she said"];
+
+        var favGifs = JSON.parse(localStorage.getItem("favList"));
+        
+        if (localStorage.getItem("favList") === null) {
+            favGifs = [];
+        }
+
+        favDisplay()
+
+        function favDisplay() {
+            $("#favGifDisplay").empty();
+            for (var i = 0; i < favGifs.length; i++) {
+                var newFavGif = $("<img>");
+                $(newFavGif).attr("src", favGifs[i]);
+                $(newFavGif).addClass("favGifClass");
+                $("#favGifDisplay").append(newFavGif);
+            }
+        }
+
+
+        $(document).on("click","#clearBtn", function(){
+            topics = ["Michael Scott", "Jim Halpert", "Dwight Shrout", "Pam Beesly", "Kevin Malone", "Andy Bernard", "Kelly Kapoor", "Holly Flax", "Creed Bratton", "That's what she said"];
+            favGifs = [];
+            $("#buttonArea").empty();
+            btnDisplay();
+            $("#gifDisplay").empty();
+            $("#favGifDisplay").empty();
+            localStorage.setItem("favList", JSON.stringify(favGifs));
+        })
+
+        function btnDisplay() {
+            for (var i = 0; i < topics.length; i++) {
+                var newBtn = $("<button>");
+                $(newBtn).text(topics[i]);
+                $(newBtn).addClass("gifBtns");
+                $(newBtn).attr("data-name", topics[i]);
+                $("#buttonArea").append(newBtn);
+            }
+
+        }
+
+        btnDisplay();
+
+        $("#addBtn").on("click", function (event) {
+            console.log($("#searchInput").val().charAt(0));
+            console.log($("#searchInput").val().charAt(0).toUpperCase());
+            var firstLetterCap = $("#searchInput").val().charAt(0).toUpperCase();
+            var restLower = $("#searchInput").val().slice(1);
+            var wordAdded = firstLetterCap + restLower;
+            console.log(wordAdded);
+            if (wordAdded === "") {
+                alert("Please type in the topic you want to search for!")
+            }
+
+            else if (topics.indexOf(wordAdded) >= 0) {
+                alert("This button is existing! Please seach for something else!")
+            }
+            else {
+                $("#buttonArea").empty();
+                topics.push(wordAdded);
+                btnDisplay();
+            }
+        })
+
+
+        $(document).on("click", ".gifBtns", function () {
+            var myKey = "O4DEFvz1DNvQEHkWLCNpfV4eDdWMssKv"
+            var topicSearched = $(this).attr("data-name");
+            console.log(topicSearched);
+            var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=" + myKey + "&q=" + topicSearched + "&limit=10";
+            var queryURL1 = "https://api.giphy.com/v1/gifs/search?q=ryan+gosling&api_key=" + myKey + "&limit=5";
+            $.ajax({
+                url: queryURL,
+                method: "GET",
+            }).then(function (response) {
+                console.log(response)
+                console.log(response.data[1].images.original.url);
+                for (var i = 0; i < 10; i++) {
+                    var gifArea = $("<div>");
+                    var gifURLStill = response.data[i].images.original_still.url;
+                    var gifURLAnimated = response.data[i].images.original.url;
+                    var rating = response.data[i].rating;
+                    var title = response.data[i].title.substring(0,25);
+                    var gifImg = $("<img>");
+                    var gifRating = $("<h5>");
+                    var gifTitle = $("<h4>");
+                    var downloadBtn = $("<a href=" + gifURLAnimated + " target='_blank' download='image.gif'>Download</a>")
+                    var favBtn = $("<a href='#'>Add to Favorites</a>")
+                    console.log(downloadBtn);
+
+                    $(gifArea).addClass("gifAreaClass");
+                    $(gifRating).text("Rating: " + rating);
+                    $(gifTitle).text("Title: " + title);
+                    $(gifImg).attr("src", gifURLStill);
+                    $(gifImg).attr("data-AnimatedURL", gifURLAnimated);
+                    $(gifImg).attr("data-stillURL", gifURLStill);
+                    $(gifImg).attr("data-isAnimate", false);
+                    $(gifImg).addClass("gifImgClass");
+                    $(gifArea).append(gifTitle);
+                    $(gifArea).append(gifRating);
+                    $(gifArea).append(gifImg);
+                    $(gifArea).append(favBtn);
+                    $(favBtn).attr("data-AnimatedURL", gifURLAnimated);
+                    $(favBtn).addClass("favBtnClass");
+                    $(gifArea).append(downloadBtn);
+                    $("#gifDisplay").prepend(gifArea);
+
+                }
+            })
+
+        })
+
+        $(document).on("click", ".gifImgClass", function () {
+            var checkStatus = $(this).attr("data-isAnimate");
+            console.log(checkStatus);
+
+            if ($(this).attr("data-isAnimate") === "true") {
+                console.log("test");
+                var currentGifURLStill = $(this).attr("data-stillURL");
+                $(this).attr("src", currentGifURLStill);
+                $(this).attr("data-isAnimate", false);
+            }
+
+            else {
+                var currentGifURLAnimatd = $(this).attr("data-AnimatedURL");
+                $(this).attr("src", currentGifURLAnimatd);
+                $(this).attr("data-isAnimate", true);
+            }
+
+        })
+
+        $(document).on("click", "#imdbBtn", function () {
+            var queryURL = "https://www.omdbapi.com/?t=the+office&y=&plot=short&apikey=trilogy";
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(response);
+                $("#imdbDisplay").text(response.imdbRating);
+            })
+
+            $("#imdbBtn").attr("hidden", "hidden");
+        })
+
+        $(document).on("click", "#actorBtn", function () {
+            var queryURL = "https://www.omdbapi.com/?t=the+office&y=&plot=short&apikey=trilogy";
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(response);
+                $("#actorDisplay").text(response.Actors);
+            })
+
+            $("#actorBtn").attr("hidden", "hidden");
+        })
+
+        $(document).on("click", "#awardsBtn", function () {
+            var queryURL = "https://www.omdbapi.com/?t=the+office&y=&plot=short&apikey=trilogy";
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                console.log(response);
+                $("#awardsDisplay").text(response.Awards);
+            })
+
+            $("#awardsBtn").attr("hidden", "hidden");
+        })
+
+    
+        $(document).on("click", ".favBtnClass", function(){
+            favGifs.push($(this).attr("data-AnimatedURL"));
+            localStorage.setItem("favList", JSON.stringify(favGifs));
+
+            favDisplay()
+        })
+
+    </script>
+
+
+    <style>
+        i {
+            margin-right: 10px;
+        }
+
+        .gifImgClass {
+            width: 200px;
+            height: 150px;
+        }
+
+        .gifBtns {
+            margin: 10px;
+            background-color: rgb(255, 206, 101);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        #searchInput {
+            margin: 10px;
+            width: 55%;
+        }
+
+        #addBtn {
+            margin: 10px;
+
+        }
+
+        .gifAreaClass {
+            float: left;
+            margin: 0px 10px 30px 10px;
+            width: 200px;
+        }
+
+        #buttonArea {
+            margin-bottom: 30px;
+        }
+
+        ul {
+            font-size: 15px;
+            font-family: 'Kreon', serif;
+            font-style: italic;
+        }
+
+        header {
+            font-size: 30px;
+            text-align: center;
+            font-weight: bold;
+            font-family: 'Abril Fatface', cursive;
+            padding: 20px;
+        }
+
+        h3 {
+            font-size: 15px;
+        }
+
+        h4{
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Abril Fatface', cursive;
+            background-color: rgb(255, 215, 129);
+            display: block;
+            margin: 0px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            padding-left: 6px;
+            
+        }
+
+        h5 {
+            font-size: 10px;
+            font-weight: bold;
+            font-family: 'Abril Fatface', cursive;
+            background-color: rgb(255, 233, 187);
+            display: block;
+            margin: 0px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            padding-left: 6px;
+            text-align: center;
+        }
+
+        #addInstruction {
+            font-family: 'Kreon', serif;
+            margin: 10px;
+        }
+
+        #addInstruction1 {
+            margin-left: 10px;
+        }
+
+        a {
+            display: block;
+            font-size: 12px;
+            background-color: whitesmoke;
+            text-align: center;
+            font-weight: bold;
+
+        }
+
+        .moreInfoStyle {
+            /* margin-left: 10px; */
+            font-size: 15px;
+            height: 150px;
+
+        }
+
+        .container {
+            background-color: rgb(255, 252, 217);
+        }
+
+        button {
+            font-weight: bold;
+            margin-bottom: 10px;
+
+        }
+
+        .card {
+            margin-bottom: 20px;
+            font-family: 'Kreon', serif;
+        }
+
+        .card-header {
+            padding: 0px;
+
+        }
+
+        #clearBtn {
+            margin: 10px;
+            background-color: rgb(253, 253, 253);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .favGifClass {
+            width: 80%;
+            margin-bottom: 20px;
+        }
+    </style>
+
+
+
+
+</body>
+
+</html>
